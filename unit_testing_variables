@@ -1,6 +1,7 @@
 #Import Statements
 import sys, io, importlib
 import random
+import math
 
 # Speed of light for use in equation 1
 c_speed = 299792458 # m / s
@@ -39,25 +40,29 @@ sys.stdout = stdout
 sys.stdin = stdin
 
 def test_passed(test_feedback):
-
-    #setting the variable or function we are checking for
-    test_variable_name = 'E'
-    
-    #Checking that the variable is present
-    if not hasattr(learner_code, test_variable_name):
-        test_feedback.write(f"The description the variable '{test_variable_name}' should exist, but it is not present in your program.")
-        return False
     
     #setting up the expected answer
-    answer =  m * (c_speed**2)
-     
+    answer =  G * m1 * m2 / r
+
     #printing the input values
-    print(f"Mass input: {m} (kg).")
-    
+    test_feedback.write(f"Input:\nMass 1: {m1} kg.\nMass 2: {m2} kg.\nDistance: {r} meters")
+
+    return test_variable('F',answer, test_feedback)
+
+
+def test_variable(var_name, answer, test_feedback):
+
+    #checks to see that the varible is in the learner code
+    if not hasattr(learner_code, var_name):
+        test_feedback.write(f"The variable '{var_name}' should exist, but it is not present in your program.")
+        return False
+
+    var_name = getattr(learner_code, var_name)
+
     #Checking the students stored value == the expected answer
-    if(answer == learner_code.E):
-        print(f"Your answer matches the expected answer: {answer} Joules")
+    if(answer == var_name):
+        test_feedback.write(f"Correct, Your answer matches the expected answer: {answer}")
         return True
     else:   
-        print(f"Incorrect.\nYour answer: {learner_code.E}\nExpected answer: {answer}")
+        test_feedback.write(f"Incorrect, Your answer: {var_name}\nExpected answer: {answer}")
         return False
