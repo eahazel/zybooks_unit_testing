@@ -2,82 +2,125 @@ import sys, io
 import random
 import importlib
 
+# Define correct functions here
+# Correct functions may apply to any of: function testing, variable testing, output/print testing
+# Function parameters should generally be from their natural form (int, float, str) and not "stringified"
+# Ask Coco for assistance if this is confusing
+# UPDATE FOR EACH PROBLEM
+def correct_sum_numbers(x, y):
+    return x + y
+
+# If checking functions, setup function checking dictionary here
+# keys are the string names of the functions that should exist in student code
+# values are the names of the functions with the correct implementations of those functions
+# UPDATE FOR EACH PROBLEM
+test_function_answers = {
+    'sum_numbers': correct_sum_numbers
+}
+
+# If checking printing, set to True here
+# UPDATE FOR EACH PROBLEM
+check_printing = True
+
+# Saved strings to build printouts in the testfeedback box
+LOG_SUCCESS = {
+    True: 'SUCCESS',
+    False: 'FAILURE'
+}
+
+# Boilerplate to enable multiple runs of the main.py the students are writing
+# returns the loaded 'main' module as 'student_main'
+# returns a string with all the stdout from student code 'stu_printed'
+def handle_run_test_main(test_input):
+    # Save off stdin, stdout
+    stdin = sys.stdin
+    stdout = sys.stdout
+
+    # Initialize test harness stdin and stdout
+    sys.stdin = io.StringIO(test_input)
+    sys.stdout = io.StringIO()
+
+    # Load or reload the module/script
+    if 'main' in sys.modules:
+        student_main = importlib.reload(sys.modules['main'])
+    else:
+        student_main = importlib.import_module('main')
+
+    # Collect any outputs
+    stu_printed = sys.stdout.getvalue().strip()
+
+    # Give back stdin and stdout control to zybooks
+    sys.stdout = stdout
+    sys.stdin = stdin
+
+    return student_main, stu_printed
+
+# If specifying a particular format string that should be printed, change it here
+# UPDATE FOR EACH PROBLEM (maybe)
+def output_formatter(answer):
+    return f"{answer}"
+
 def test_passed(test_feedback):
-    # Set the name of the function we are testing
-    test_function_name = 'diff_numbers'
-
-    # Set to True if print out is being checked
-    check_printing = True
-    check_function = False
-
-    test_passed = True
-    for i in range(1,5):
-        # Set up randomized values for inputs
-        x = random.randint(1,50)
-        y = random.randint(1,50)
-
-        # Craft inputs
-        test_input=f"{x}\n{y}"
-
-        # Set up real answer based on those inputs
-        act_ans = abs(x-y)
-
-        # Save off stdin, stdout
-        stdin = sys.stdin
-        stdout = sys.stdout
-
-        # Initialize test harness stdin and stdout
-        sys.stdin = io.StringIO(test_input)
-        sys.stdout = io.StringIO()
-
-        # Load or reload the module/script
-        if 'main' in sys.modules:
-            learner_code = importlib.reload(sys.modules['main'])
-        else:
-            learner_code = importlib.import_module('main')
-
-        # Collect any outputs
-        stu_printed = sys.stdout.getvalue().strip()
-
-        # Give back stdin and stdout control to zybooks
-        sys.stdout = stdout
-        sys.stdin = stdin
-
+    # Should not need to update this function
+    def check_function_return_value(student_main, function_name, function_inputs):
         # Verify the function exists in the imported module
-        if not hasattr(learner_code, test_function_name):
-            test_feedback.write(f"The description the '{test_function_name}' function should exist, but it is not present in your program.")
+        if not hasattr(student_main, function_name):
+            test_feedback.write(f"The description the '{function_name}' function should exist, but it is not present in your program.")
             return False
         else:
             # test_function is now the function we are grading/validating
-            test_function = getattr(learner_code, test_function_name)
+            test_function = getattr(student_main, function_name)
         
         # Verify the attribute is actually a callable function
         if not callable(test_function):
-            test_feedback.write(f"The description the '{test_function_name}' function should exist, but it is not present in your program.")
+            test_feedback.write(f"The description the '{function_name}' function should exist, but it is not present in your program.")
             return False
 
-        # Call the student's function (implementation may vary)
-        stu_ans = test_function(x, y)
+        # Call the student's function
+        stu_ans = test_function(*function_inputs)
 
-        log_strings = {
-            True: 'SUCCESS',
-            False: 'FAILURE'
-        }
+        # Call the correct function (solution) defined above
+        act_ans = test_function_answers[function_name](*function_inputs)
 
-        # If we're grading function, check if function returns expected answer
-        if check_function:
-            success = stu_ans == act_ans
-            if not success:
-                test_passed = False
-            test_feedback.write(f"Test {i} --> Checking Function --> {log_strings[success]} --> '{test_function_name}({x}, {y})' Returned: {stu_ans}, Expected: {act_ans}")
+        success = stu_ans == act_ans
+        test_feedback.write(f"Test {i} --> Checking Function --> {LOG_SUCCESS[success]} --> '{function_name}({x}, {y})' Returned: {stu_ans}, Expected: {act_ans}")
+        return success
+
+    # Create a list of test run arguments
+    # If only running main a single time, then just use the following line instead
+    # test_run_stdin_inputs = [(value1, value2)]
+    # UPDATE FOR EACH PROBLEM
+    test_run_inputs = []
+    for i in range(1,5):
+        # Randomization approach for problem
+        # UPDATE FOR EACH PROBLEM
+        x = random.randint(1,50)
+        y = random.randint(1,50)
+        inputs = (x,y)
+        test_run_inputs.append(inputs)
+
+
+
+    # Setup randomized grading test passes here
+    test_passed = True
+    test_num = 0
+    for test_run_input in test_run_inputs:
+        # Craft inputs
+        test_stdin = '\n'.join((str(x) for x in test_run_input))
+
+        # Set up real answer based on those inputs
+        act_ans = correct_sum_numbers(*test_run_input)
+
+        # Perform test run and collect any output
+        student_main, stu_outputs = handle_run_test_main(test_stdin)
 
         # If we're grading print statements, ensure correct output is somewhere in student's prints (implementation may vary)
         if check_printing:
-            success = str(act_ans) in stu_printed
+            success = output_formatter(act_ans) in stu_outputs
             if success:
-                test_feedback.write(f"Test {i} --> Checking Output --> Using Inputs '{x}' and '{y}' --> {log_strings[success]} --> Found '{act_ans}' in output, as expected")
+                test_feedback.write(f"Test {i} --> Checking Output --> Using Inputs '{x}' and '{y}' --> {LOG_SUCCESS[success]} --> Found '{act_ans}' in output, as expected")
             else:
-                test_feedback.write(f"Test {i} --> Checking Output --> Using Inputs '{x}' and '{y}' --> {log_strings[success]} --> Did not find '{act_ans}' in output!")
+                test_feedback.write(f"Test {i} --> Checking Output --> Using Inputs '{x}' and '{y}' --> {LOG_SUCCESS[success]} --> Did not find '{act_ans}' in output!")
                 test_passed = False
 
     return test_passed
