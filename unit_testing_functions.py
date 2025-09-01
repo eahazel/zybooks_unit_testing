@@ -83,7 +83,7 @@ def test_function(fun_name, answer, learner_code, test_feedback, *args):
         test_fun = getattr(learner_code, fun_name)
     
     # Verify the attribute is actually a callable function
-        if not callable(test_function):
+        if not callable(fun_name):
             test_feedback.write(f"The description the '{fun_name}' function should exist, but it is not present in your program.")
             return False
     
