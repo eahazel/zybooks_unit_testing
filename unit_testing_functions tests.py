@@ -46,26 +46,29 @@ def test_passed(test_feedback):
         if output_check == True:
             test_passed = check_outputs(answers, stu_output, test_feedback)
             if test_passed == False:
-                return test_passed
+                break
         if var_check == True:
             test_passed = test_variable(var_or_fun_name, answers, learner_code, test_feedback)
             if test_passed == False:
-                return test_passed
+                break
         if fun_check == True:
             test_passed = test_function(var_or_fun_name, answers, learner_code, test_feedback, *raw_inputs)
             if test_passed == False:
-                return test_passed
-
+                break
+    
+    if test_passed:
+        test_feedback.write(f"Output is Correct")
+    else:
+        test_feedback.write(f"Output is Incorrect")
+    
     return test_passed
 
 def check_outputs(answers, output, test_feedback):
-    #Checks for the lowercase answer in the lowercase student output
     result = True
     for answer in answers:
         if answer in output:
-            test_feedback.write(f"Correct, Your answer matches the expected answer: \n{answer}\n")
+            pass
         else:
-            test_feedback.write(f"Incorrect, the expected answer: \n{answer}\nWhich is not in your output\n")
             result = False
     return result
 
@@ -82,12 +85,11 @@ def test_variable(var_name, answers, learner_code, test_feedback):
     result = True
     for answer in answers:
         if(answer == test_var):
-            test_feedback.write(f"Correct, Your answer matches the expected answer: {answer}")
+            pass
         else:   
-            test_feedback.write(f"Incorrect, Your answer: {test_var}\nExpected answer: {answer}")
             result = False
     return result
-
+    
 def test_function(fun_name, answers, learner_code, test_feedback, *args):
     # Verify the function exists in the imported module
     if not hasattr(learner_code, fun_name):
@@ -109,9 +111,8 @@ def test_function(fun_name, answers, learner_code, test_feedback, *args):
     result = True
     for answer in answers:
         if(answer == stu_ans):
-            test_feedback.write(f"Checking Function --> Success --> '{fun_name}{args}' Returned: {answer} as expected")
+            pass
         else:   
-            test_feedback.write(f"Checking Function --> Failure --> '{fun_name}{args}' Returned: {stu_ans} instead of {answer}")
             result = False
     return result
 
