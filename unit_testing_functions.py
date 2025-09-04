@@ -8,29 +8,54 @@ output_check = True
 var_check = False
 fun_check = False
 
-#create the actual answer
+# create the actual answer
+# return has to be a list
 # UPDATE FOR EACH PROBLEM
-def actual_answers(name, age, num):
-    return f"Name: {name}",f"Age: {age}",f"Favorite Number: {num}"
+def actual_answers(ingredient_to_check):
+    
+    basic = ["water", "stone", "herb", "moss", "granite", "spider", "mushroom", "root"]
+    intermediate = ["quicksilver", "obsidian flake", "mandrake root", "eye of newt", "spider silk"]
+    advanced = ["dragonscale", "phoenix feather", "griffin talon", "starlight dust", "unicorn horn", "crystal"]
+    def is_in_book(ingredient, book_name):
+        if(ingredient in basic):
+            return book_name == "Book of Basics"
+        if(ingredient in intermediate):
+            return book_name == "Adept's Almanac"
+        if(ingredient in advanced):
+            return book_name == "Archmage's Grimoire"
+
+    if is_in_book(ingredient_to_check, "Book of Basics"):
+        return ["Common"]
+    elif is_in_book(ingredient_to_check, "Adept's Almanac"):
+        return ["Rare"]
+    elif is_in_book(ingredient_to_check, "Archmage's Grimoire"):
+        return ["Legendary"]
+    else:
+        return ["Unknown"]
 
 # If you are checking a function or variable what is it's name
 # UPDATE FOR EACH PROBLEM
-var_or_fun_name = 'diff_numbers'
+var_or_fun_name = 'get_accessory_cost'
+
+# The number of arguments the function needs
+# to account for the location of the desired args in the inputs
+# remeber the stop must be one # passed where you want to stop
+# UPDATE FOR EACH PROBLEM
+fun_arg_start = 0
+fun_arg_stop = 1
 
 # How many interations of the test do you want to run?
 iterations = 5
 test_inputs_raw = []
 
-#create your inputs
+#create your inputs all main inputs must be accounted for
 for i in range(iterations):
     # Set up randomized values for inputs
-    name_list = ['Michael', 'Bobby', 'Ed', 'Fred', 'James']
-    name = random.choice(name_list)
-    age = random.randint(18,50)
-    num = round(random.random() * 50, 1) 
+    ingredient_list = ["water", "stone", "herb", "moss", "granite", "spider", "mushroom", "root"]
+    ingredient_to_check = random.choice(ingredient_list)
 
     # Craft inputs
-    test_inputs_raw.append([name, age, num])
+    test_inputs_raw.append([ingredient_to_check])
 
 #Nothing after this should need adjustment
 def test_passed(test_feedback):
@@ -40,6 +65,17 @@ def test_passed(test_feedback):
         test_input = '\n'.join([str(x) for x in raw_inputs])
 
         learner_code, stu_output = handle_run_test_main(test_input)
+
+        if stu_output == 'ValueError':
+            test_feedback.write(f"Check your Variable types")
+            return False
+        
+        if stu_output == 'EOFError':
+            test_feedback.write(f"There are more inputs then expected")
+            return False
+
+        if fun_check:
+            raw_inputs = raw_inputs[fun_arg_start:fun_arg_stop]
 
         answers = actual_answers(*raw_inputs)
 
