@@ -1,4 +1,4 @@
-# Name Test "'{function_name}' Test"
+# Name Test "'{function_name}' {print/return} Test"
 #Import Statements
 
 import sys, importlib, random, math
@@ -76,11 +76,13 @@ def test_passed(test_feedback):
                 main = fresh_import('main', test_feedback)
     
         answer = actual_answers(*raw_inputs)
+        
+        function_arg = raw_inputs[fun_arg_start:fun_arg_stop]
 
         if lab_feedback:
             test_feedback.write(f"given the inputs of {raw_inputs} your code was:")
 
-        test_passed = test_function(function_name, answer, main, test_feedback)
+        test_passed = test_function(function_name, answer, main, test_feedback,sink.getvalue(), *function_arg)
 
     return test_passed
         
