@@ -65,6 +65,11 @@ def test_passed(test_feedback):
 
         test_passed = test_variable(variable_name, answer, main, test_feedback)
 
+        if test_passed:
+            test_feedback.write(f"Your program works as intended")
+        else:
+            test_feedback.write(f"Your program does not works as intended")
+
     return test_passed
         
 # Brings in the student's code, catches the ValueError and EOFError
@@ -95,15 +100,15 @@ def test_variable(var_name, answers, module_name, test_feedback):
             if type(answer) == type(test_var):
                 if answer == test_var or (type(answer) == float and math.isclose(answer, test_var)):
                     if PA_feedback:
-                        test_feedback.write(f"Correct, your value matches the expected value\n")
+                        test_feedback.write(f"Your value matches the expected value\n")
                     elif lab_feedback:
-                        test_feedback.write(f"Correct, Your answer matches the expected value: {answer}\n")
+                        test_feedback.write(f"Your answer matches the expected value: {answer}\n")
                 else:   
                     result = False
                     if PA_feedback:
-                         test_feedback.write(f"Incorrect, your value does not match the expected value\n")
+                         test_feedback.write(f"Your value does not match the expected value\n")
                     elif lab_feedback:
-                        test_feedback.write(f"Incorrect, Your answer: {test_var}\nExpected value: {answer}\n")
+                        test_feedback.write(f"Your answer: {test_var}\nExpected value: {answer}\n")
             else:
                 result = False
                 test_feedback.write(f"Check your data type\n")

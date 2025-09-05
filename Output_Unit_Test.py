@@ -12,11 +12,16 @@ from types import ModuleType
 # Feedback options, lab_feedback gives a lot of feedback, test_feedback provides minimun feedback
 
 lab_feedback = True
-PA_feedback = False
+pa_feedback = False
 
 # Create the answer you are looking for based on inputs, *** return must be a list
-def actual_answers(age):
-    return [age + 4]
+def actual_answers(stop):
+    nums = []
+    i = 0
+    while i < stop:
+        nums.append(i)
+        i = i + 1
+    return nums
 
 # How many interations of the test do you want to run?
 iterations = 5
@@ -33,13 +38,13 @@ for i in range(iterations):
     #name = random.choice(name_list)
     
     #random int
-    age = random.randint(18, 24)
+    stop = random.randint(2, 10)
 
     #random float
     #decimal = round(random.random() * 1000, 2)
 
     # Craft inputs, *** must be a list
-    test_inputs_raw.append([age])
+    test_inputs_raw.append([stop])
 
 # ***After this point nothing should need to be changed***
 
@@ -61,6 +66,11 @@ def test_passed(test_feedback):
 
         test_passed = check_outputs(answers, sink.getvalue(), test_feedback)
 
+        if test_passed:
+            test_feedback.write(f"Your program works as intended\n\n")
+        else:
+            test_feedback.write(f"Your program does NOT works as intended\n\n")
+
     return test_passed
         
 # Brings in the student's code, catches the ValueError and EOFError
@@ -80,15 +90,15 @@ def check_outputs(answers, output, test_feedback):
     result = True
     for answer in answers:
         if str(answer) in output:
-            if PA_feedback:
-                test_feedback.write(f"Correct, your printed value matches the expected value\n")
+            if pa_feedback:
+                test_feedback.write(f"Your printed value matches the expected value")
             elif lab_feedback:
-                test_feedback.write(f"Correct, Your printed value matches the expected value of: {answer}\n")
+                test_feedback.write(f"Your printed value matches the expected value of: {answer}")
         else:
             result = False
-            if PA_feedback:
-                test_feedback.write(f"Incorrect, your printed value does not match the expected value\n")
+            if pa_feedback:
+                test_feedback.write(f"Your printed value does not match the expected value")
             elif lab_feedback:
-                test_feedback.write(f"Incorrect, Your printed value does not match the expected value of: {answer}\n")
+                test_feedback.write(f"Your printed value does not match the expected value of: {answer}")
 
     return result

@@ -1,7 +1,7 @@
 # Name Test "'{function_name}' {print/return} Test"
 #Import Statements
 
-import sys, importlib, random, math
+import sys, importlib, random, math, inspect
 from unittest.mock import patch
 from io import StringIO
 from contextlib import redirect_stdout
@@ -84,6 +84,11 @@ def test_passed(test_feedback):
 
         test_passed = test_function(function_name, answer, main, test_feedback,sink.getvalue(), *function_arg)
 
+        if test_passed:
+            test_feedback.write(f"Your program works as intended")
+        else:
+            test_feedback.write(f"Your program does not works as intended")
+
     return test_passed
         
 # Brings in the student's code, catches the ValueError and EOFError
@@ -109,10 +114,17 @@ def test_function(fun_name, answers, learner_code, test_feedback, output = '', *
         test_fun = getattr(learner_code, fun_name)
     
     # Verify the attribute is actually a callable function
-        if not callable(test_fun):
-            test_feedback.write(f"The function '{fun_name}' is not callable")
-            return False
+    if not callable(test_fun):
+        test_feedback.write(f"The function '{fun_name}' is not callable")
+        return False
     
+    # Verify the function has the correct number of args
+    sig = inspect.signature(test_fun)
+    num_args = fun_arg_stop - fun_arg_start
+    if len(sig) != (num_args):
+        test_feedback.write(f"The function '{test_fun}' must take exactly {num_args} parameter(s), but it takes {len(sig.parameters)}.\n")
+        return False
+
     #call the students function
     stu_ans = test_fun(*args)
 
@@ -122,24 +134,28 @@ def test_function(fun_name, answers, learner_code, test_feedback, output = '', *
         if print_check:
             if str(answer) in output:
                 if PA_feedback:
-                    test_feedback.write(f"Correct, your function works as expected\n")
+                    test_feedback.write(f"Your function works as expected\n")
                 elif lab_feedback:
-                    test_feedback.write(f"Correct, your function printed the expected value: {answer}\n")
+                    test_feedback.write(f"Your function printed the expected value: {answer}\n")
             else:
                 if PA_feedback:
-                    test_feedback.write(f"Incorrect, your function does not work as expected\n")
+                    test_feedback.write(f"Your function does not work as expected\n")
                 elif lab_feedback:
-                    test_feedback.write(f"Incorrect, your function did not print the expected value of: {answer}\n")
+                    test_feedback.write(f"Your function did not print the expected value of: {answer}\n")
         else:
-            if(answer == stu_ans):
-                if PA_feedback:
-                    test_feedback.write(f"Correct, your function works as expected\n")
-                elif lab_feedback:
-                    test_feedback.write(f"Correct, your function returns the expected value: {answer}\n")
-            else:   
+            if type(answer) == type(stu_ans):
+                if answer == stu_ans or (type(answer) == float and math.isclose(answer, stu_ans)):
+                    if PA_feedback:
+                        test_feedback.write(f"Your function works as expected\n")
+                    elif lab_feedback:
+                        test_feedback.write(f"Your function returns the expected value: {answer}\n")
+                else:   
+                    result = False
+                    if PA_feedback:
+                        test_feedback.write(f"Your function does not work as expected\n")
+                    elif lab_feedback:
+                        test_feedback.write(f"Your function returns: {stu_ans}\n The expected return is: {answer}\n")
+            else:
                 result = False
-                if PA_feedback:
-                    test_feedback.write(f"Incorrect, your function does not work as expected\n")
-                elif lab_feedback:
-                    test_feedback.write(f"Incorrect, your function returns: {stu_ans}\n The expected return is: {answer}\n")
+                test_feedback.write(f"Check your data type\n")
     return result
