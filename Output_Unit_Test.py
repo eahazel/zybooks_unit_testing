@@ -15,36 +15,36 @@ lab_feedback = True
 pa_feedback = False
 
 # Create the answer you are looking for based on inputs, *** return must be a list
-def actual_answers(stop):
-    nums = []
+def actual_answers(*args):
+    count = 0
     i = 0
-    while i < stop:
-        nums.append(i)
-        i = i + 1
-    return nums
+    while i < len(args):
+        if args[i] > 80:
+            count += 1
+        i += 1
+    return [count]
 
 # How many interations of the test do you want to run?
-iterations = 5
+iterations = 1
 
 #create your inputs all main inputs must be accounted for
 
 test_inputs_raw = []
+test_percent = [80,93]
 
 for i in range(iterations):
     # Create the inputs using random
+    x = 0
+    while x != -1:
+        #random int
+        if len(test_percent) > 10:
+            x = -1            
+        else:
+            x = random.randint(-1, 100)
+        test_percent.append(x)
     
-    #random strings
-    #name_list = ["Edward", "James", "David", "Tiffany", "Claire", "Sarah"]
-    #name = random.choice(name_list)
-    
-    #random int
-    stop = random.randint(2, 10)
-
-    #random float
-    #decimal = round(random.random() * 1000, 2)
-
     # Craft inputs, *** must be a list
-    test_inputs_raw.append([stop])
+    test_inputs_raw.append(test_percent)
 
 # ***After this point nothing should need to be changed***
 
@@ -62,7 +62,7 @@ def test_passed(test_feedback):
         answers = actual_answers(*raw_inputs)
 
         if lab_feedback:
-            test_feedback.write(f"given the inputs of {raw_inputs} your code was:")
+            test_feedback.write(f"given the inputs of {raw_inputs}:")
 
         test_passed = check_outputs(answers, sink.getvalue(), test_feedback)
 
@@ -91,14 +91,14 @@ def check_outputs(answers, output, test_feedback):
     for answer in answers:
         if str(answer) in output:
             if pa_feedback:
-                test_feedback.write(f"Your printed value matches the expected value")
+                test_feedback.write(f"Your code printed value matches the expected value")
             elif lab_feedback:
-                test_feedback.write(f"Your printed value matches the expected value of: {answer}")
+                test_feedback.write(f"Your code printed value matches the expected value of: {answer}")
         else:
             result = False
             if pa_feedback:
-                test_feedback.write(f"Your printed value does not match the expected value")
+                test_feedback.write(f"Your code printed value does not match the expected value")
             elif lab_feedback:
-                test_feedback.write(f"Your printed value does not match the expected value of: {answer}")
+                test_feedback.write(f"Your code printed value does not match the expected value of: {answer}")
 
     return result
